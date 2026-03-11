@@ -2,6 +2,9 @@ package com.springSecurityImpl.springsecurity.config;
 
 import com.springSecurityImpl.springsecurity.exceptionhandling.CustomAccessDeniedHandler;
 import com.springSecurityImpl.springsecurity.exceptionhandling.CustomBasicAuthenticationEntryPoint;
+import com.springSecurityImpl.springsecurity.filter.AuthoritiesLoggingAfterFilter;
+import com.springSecurityImpl.springsecurity.filter.AuthoritiesLoggingAtFilter;
+import com.springSecurityImpl.springsecurity.filter.RequestValidationBeforeFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -12,6 +15,7 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -41,6 +45,9 @@ public class ProjectSecurityConfig {
 //                        .ignoringRequestMatchers( "/contact","/register")
 //                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
 //                .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
+                .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
+                .addFilterAt(new AuthoritiesLoggingAtFilter(), BasicAuthenticationFilter.class)
 //                .requiresChannel(rcc -> rcc.anyRequest().requiresInsecure()) // Only HTTP - deprecated
                 .redirectToHttps((https) -> https.disable()) // Only HTTP
                 .authorizeHttpRequests((requests) -> requests
